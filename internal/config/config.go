@@ -10,12 +10,12 @@ import (
 
 
 type HttpServer struct{
-	Addr string `yaml:"address"`
+	Addr string `yaml:"address" env-default:"localhost:8082" env-required:"true"`
 }
 
 type Config struct{
-	Env string `yaml:"env"`
-	StoragePath string `yaml:"storage_path"`
+	Env string `yaml:"env" env-required:"true"`
+	StoragePath string `yaml:"storage_path" env-required:"true"`
 	HttpServer  `yaml:"http_server"`
 }
 
