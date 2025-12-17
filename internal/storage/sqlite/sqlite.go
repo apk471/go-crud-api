@@ -2,6 +2,9 @@ package sqlite
 
 import (
 	"database/sql"
+	"fmt"
+
+	"github.com/apk471/go-crud-api/internal/types"
 
 	"github.com/apk471/go-crud-api/internal/config"
 	_ "github.com/mattn/go-sqlite3"
@@ -52,4 +55,25 @@ func (s *Sqlite) CreateUser(name string, email string, age int) (int64, error) {
 	}
 
 	return lastId, nil
+}
+
+func (s *Sqlite) GetUserById(id int64) (types.User, error) {
+	stmt, err := s.Db.Prepare("SELECT id, name, email, age FROM students WHERE id = ? LIMIT 1")
+	if err != nil {
+		return types.User{}, err
+	}
+
+	defer stmt.Close()
+
+	var user types.User
+
+	err = stmt.QueryRow(id).Scan(&user.ID, &user.Name, &user.Email, &user.Age)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return types.User{}, fmt.Errorf("no user found with id %s", fmt.Sprint(id))
+		}
+		return types.User{}, fmt.Errorf("query error: %w", err)
+	}
+
+	return user, nil
 }
