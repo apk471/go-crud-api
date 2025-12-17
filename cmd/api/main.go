@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"log/slog"
 	"net/http"
 	"os"
@@ -11,6 +12,8 @@ import (
 	"time"
 
 	"github.com/apk471/go-crud-api/internal/config"
+	"github.com/apk471/go-crud-api/internal/http/handlers/api"
+	"github.com/apk471/go-crud-api/internal/storage/sqlite"
 )
 
 func main() {
@@ -18,9 +21,20 @@ func main() {
 	cfg := config.MustLoad()
 
 	router := http.NewServeMux()
-	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Welcome to CRUD API"))
-	})
+	// router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	// 	w.Write([]byte("Welcome to CRUD API"))
+	// })
+
+	storage, err := sqlite.New(cfg)
+
+	if err != nil{
+		log.Fatal(err)	
+	}
+
+	slog.Info("storage initialized", slog.String("env", cfg.Env), slog.String("version", "1.0.0"))
+
+	router.HandleFunc("POST /api/users" , api.New(storage))
+
 
 	server := http.Server{
 		Addr: cfg.HttpServer.Addr,
