@@ -34,6 +34,8 @@ func main() {
 	slog.Info("storage initialized", slog.String("env", cfg.Env), slog.String("version", "1.0.0"))
 
 	router.HandleFunc("POST /api/users" , api.New(storage))
+	router.HandleFunc("GET /api/students/{id}", api.GetById(storage))
+	router.HandleFunc("GET /api/students" , api.GetList(storage))
 
 
 	server := http.Server{
